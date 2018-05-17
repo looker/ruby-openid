@@ -121,6 +121,7 @@ module OpenID
 
     attr_accessor :ca_file
     attr_accessor :timeout
+    attr_accessor :ssl_verify_peer
 
     # I can fetch through a HTTP proxy; arguments are as for Net::HTTP::Proxy.
     def initialize(proxy_addr=nil, proxy_port=nil,
@@ -128,6 +129,7 @@ module OpenID
       @ca_file = nil
       @proxy = Net::HTTP::Proxy(proxy_addr, proxy_port, proxy_user, proxy_pass)
       @timeout = TIMEOUT
+      @ssl_verify_peer = nil
     end
 
     def supports_ssl?(conn)
@@ -165,6 +167,8 @@ module OpenID
           if @ca_file
             set_verified(conn, true)
             conn.ca_file = @ca_file
+          elsif @ssl_verify_peer
+            set_verified(conn, true)
           else
             Util.log("WARNING: making https request to #{uri} without verifying " +
                      "server certificate; no CA path was specified.")
